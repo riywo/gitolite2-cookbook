@@ -43,12 +43,10 @@ directory node['gitolite']['home'] do
   mode 0750
 end
 
-%w{ bin repositories }.each do |subdir|
-  directory "#{node['gitolite']['home']}/#{subdir}" do
-    owner node['gitolite']['user']
-    group node['gitolite']['group']
-    mode 0775
-  end
+directory "#{node['gitolite']['home']}/bin" do
+  owner node['gitolite']['user']
+  group node['gitolite']['group']
+  mode 0775
 end
 
 # Create a $HOME/.ssh folder
@@ -73,6 +71,27 @@ execute "gitolite-install" do
   cwd node['gitolite']['home']
   command "#{node['gitolite']['gitolite_home']}/install -ln #{node['gitolite']['home']}/bin"
   creates "#{node['gitolite']['home']}/bin/gitolite"
+end
+
+# Render public key template
+template "#{node['gitolite']['home']}/.ssh/gitolite.pub" do
+  owner node['gitolite']['user']
+  group node['gitolite']['group']
+  mode 0644
+  variables(
+    :public_key => node['gitolite']['public_key']
+  )
+  not_if { File.exists?("#{node['gitolite']['home']}/.ssh/gitolite.pub") }
+end
+
+# Gitolite public key setup script
+execute "gitolite setup" do
+  user node['gitolite']['user']
+  group node['gitolite']['user']
+  cwd node['gitolite']['home']
+  environment ({'HOME' => node['gitolite']['home']})
+  command "#{node['gitolite']['home']}/bin/gitolite setup -pk #{node['gitolite']['home']}/.ssh/gitolite.pub"
+  not_if "grep -q '#{node['gitolite']['public_key']}' #{node['gitolite']['home']}/.ssh/authorized_keys"
 end
 
 # Gitolite.rc template

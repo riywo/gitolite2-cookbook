@@ -1,4 +1,9 @@
 require 'berkshelf/vagrant'
+require 'open-uri'
+
+vagrant_pub_key = open('https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub') do |f|
+  f.read
+end.chomp
 
 Vagrant::Config.run do |config|
   # All Vagrant configuration is done here. The most common configuration
@@ -50,6 +55,9 @@ Vagrant::Config.run do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.json = {
+      :gitolite => {
+        :public_key => vagrant_pub_key,
+      },
     }
 
     chef.run_list = [
