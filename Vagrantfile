@@ -55,13 +55,13 @@ Vagrant::Config.run do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.json = {
-      :gitolite => {
+      :gitolite2 => {
         :public_key => vagrant_pub_key,
       },
     }
 
     chef.run_list = [
-      "recipe[gitolite::default]"
+      "recipe[gitolite2::default]"
     ]
   end
 end

@@ -1,4 +1,4 @@
-name             "gitolite"
+name             "gitolite2"
 maintainer       "Ryosuke IWANAGA"
 maintainer_email "riywo.jp@gmail.com"
 license          "Apache 2.0"

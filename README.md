@@ -1,4 +1,4 @@
-# gitolite cookbook
+# gitolite2 cookbook
 
 Installs gitolite
 
@@ -30,7 +30,7 @@ Installs gitolite
 
 # Recipes
 
-- `gitolite::default`
+- `gitolite2::default`
 
 # Thanks
 

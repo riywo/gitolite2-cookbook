@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: gitolite
+# Cookbook Name:: gitolit2
 # Recipe:: default
 #
 # Copyright 2010, RailsAnt, Inc.
@@ -18,7 +18,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 #
-if node['gitolite']['public_key'].nil?
+if node['gitolite2']['public_key'].nil?
   Chef::Log.fatal("You must pass your public key content by gitolite/public_key")
   raise Chef::Exceptions
 end
@@ -35,77 +35,78 @@ end
 
 # Add git user
 # Password isn't set correctly in original recipe, and really no reason to set one.
-user node['gitolite']['user'] do
+user node['gitolite2']['user'] do
   comment "Git User"
-  home node['gitolite']['home']
+  home node['gitolite2']['home']
   shell "/bin/bash"
   supports :manage_home => true
 end
 
-directory node['gitolite']['home'] do
-  owner node['gitolite']['user']
-  group node['gitolite']['group']
+directory node['gitolite2']['home'] do
+  owner node['gitolite2']['user']
+  group node['gitolite2']['group']
   mode 0750
 end
 
-directory "#{node['gitolite']['home']}/bin" do
-  owner node['gitolite']['user']
-  group node['gitolite']['group']
+directory "#{node['gitolite2']['home']}/bin" do
+  owner node['gitolite2']['user']
+  group node['gitolite2']['group']
   mode 0775
 end
 
 # Create a $HOME/.ssh folder
-directory "#{node['gitolite']['home']}/.ssh" do
-  owner node['gitolite']['user']
-  group node['gitolite']['group']
+directory "#{node['gitolite2']['home']}/.ssh" do
+  owner node['gitolite2']['user']
+  group node['gitolite2']['group']
   mode 0700
 end
 
+# Gitolite.rc template
+template "#{node['gitolite2']['home']}/.gitolite.rc" do
+  source "gitolite.rc.erb"
+  owner node['gitolite2']['user']
+  group node['gitolite2']['group']
+  mode 0644
+  variables(
+    :umask => node['gitolite2']['umask']
+  )
+end
+
 # Clone gitolite repo from github
-git node['gitolite']['gitolite_home'] do
-  repository node['gitolite']['gitolite_url']
-  reference node['gitolite']['gitolite_reference']
-  user node['gitolite']['user']
-  group node['gitolite']['group']
+git node['gitolite2']['gitolite_home'] do
+  repository node['gitolite2']['gitolite_url']
+  reference node['gitolite2']['gitolite_reference']
+  user node['gitolite2']['user']
+  group node['gitolite2']['group']
   action :checkout
 end
 
 # Gitolite application install script
 execute "gitolite-install" do
-  user node['gitolite']['user']
-  cwd node['gitolite']['home']
-  command "#{node['gitolite']['gitolite_home']}/install -ln #{node['gitolite']['home']}/bin"
-  creates "#{node['gitolite']['home']}/bin/gitolite"
+  user node['gitolite2']['user']
+  cwd node['gitolite2']['home']
+  command "#{node['gitolite2']['gitolite_home']}/install -ln #{node['gitolite2']['home']}/bin"
+  creates "#{node['gitolite2']['home']}/bin/gitolite"
 end
 
 # Render public key template
-template "#{node['gitolite']['home']}/.ssh/gitolite.pub" do
-  owner node['gitolite']['user']
-  group node['gitolite']['group']
+template "#{node['gitolite2']['home']}/.ssh/gitolite.pub" do
+  owner node['gitolite2']['user']
+  group node['gitolite2']['group']
   mode 0644
   variables(
-    :public_key => node['gitolite']['public_key']
+    :public_key => node['gitolite2']['public_key']
   )
-  not_if { File.exists?("#{node['gitolite']['home']}/.ssh/gitolite.pub") }
+  not_if { File.exists?("#{node['gitolite2']['home']}/.ssh/gitolite.pub") }
 end
 
 # Gitolite public key setup script
 execute "gitolite setup" do
-  user node['gitolite']['user']
-  group node['gitolite']['user']
-  cwd node['gitolite']['home']
-  environment ({'HOME' => node['gitolite']['home']})
-  command "#{node['gitolite']['home']}/bin/gitolite setup -pk #{node['gitolite']['home']}/.ssh/gitolite.pub"
-  not_if "grep -q '#{node['gitolite']['public_key']}' #{node['gitolite']['home']}/.ssh/authorized_keys"
+  user node['gitolite2']['user']
+  group node['gitolite2']['user']
+  cwd node['gitolite2']['home']
+  environment ({'HOME' => node['gitolite2']['home']})
+  command "#{node['gitolite2']['home']}/bin/gitolite setup -pk #{node['gitolite2']['home']}/.ssh/gitolite.pub"
+  not_if "grep -q '#{node['gitolite2']['public_key']}' #{node['gitolite2']['home']}/.ssh/authorized_keys"
 end
 
-# Gitolite.rc template
-template "#{node['gitolite']['home']}/.gitolite.rc" do
-  source "gitolite.rc.erb"
-  owner node['gitolite']['user']
-  group node['gitolite']['group']
-  mode 0644
-  variables(
-    :gitolite_umask => node['gitolite']['umask']
-  )
-end

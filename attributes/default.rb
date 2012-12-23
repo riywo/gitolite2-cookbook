@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: gitolite
+# Cookbook Name:: gitolite2
 # Attributes:: default
 #
 # Copyright 2010, RailsAnt, Inc.
@@ -19,16 +19,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default['gitolite']['gitolite_url'] = "git://github.com/sitaramc/gitolite.git"
-default['gitolite']['gitolite_reference'] = "master"
-default['gitolite']['user'] = "git"
-default['gitolite']['group'] = "git"
+default['gitolite2']['gitolite_url'] = "git://github.com/sitaramc/gitolite.git"
+default['gitolite2']['gitolite_reference'] = "master"
+default['gitolite2']['user'] = "git"
+default['gitolite2']['group'] = "git"
 
 # Set git home directory
-default['gitolite']['home'] = "/var/git"
+default['gitolite2']['home'] = "/var/git"
 
 # Set gitolite home directory
-default['gitolite']['gitolite_home'] = "#{node['gitolite']['home']}/gitolite"
+default['gitolite2']['gitolite_home'] = "#{node['gitolite2']['home']}/gitolite"
 
 # Set gitolite umask
-default['gitolite']['umask'] = "0007"
+default['gitolite2']['umask'] = "0007"
