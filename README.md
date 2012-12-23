@@ -32,6 +32,10 @@ Installs gitolite
 
 - `gitolite::default`
 
+# Thanks
+
+- https://github.com/atomic-penguin/cookbook-gitlab
+
 # Author
 
 - Ryosuke IWANAGA (<riywo.jp@gmail.com>)
