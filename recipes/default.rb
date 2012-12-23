@@ -22,6 +22,12 @@
   include_recipe cb_include
 end
 
+# Install missing perl modules
+case node['platform']
+when "redhat","centos","scientific","amazon","oracle","fedora"
+  package "perl-Time-HiRes"
+end
+
 # Add git user
 # Password isn't set correctly in original recipe, and really no reason to set one.
 user node['gitolite']['user'] do
