@@ -88,6 +88,7 @@ end
 # Gitolite application install script
 execute "gitolite-install" do
   user node['gitolite2']['user']
+  group node['gitolite2']['group']
   cwd node['gitolite2']['home']
   command "#{node['gitolite2']['gitolite_home']}/install -ln #{node['gitolite2']['home']}/bin"
   creates "#{node['gitolite2']['home']}/bin/gitolite"
@@ -95,18 +96,30 @@ end
 
 # Create public key
 key_file = "#{node['gitolite2']['home']}/.ssh/admin.pub"
-file key_file do
-  owner node['gitolite2']['user']
-  group node['gitolite2']['group']
-  mode 0644
-  content node['gitolite2']['public_key'] || File.read(node['gitolite2']['public_key_path'])
-  action :create
+unless node['gitolite2']['public_key'].nil?
+  file key_file do
+    owner node['gitolite2']['user']
+    group node['gitolite2']['group']
+    mode 0644
+    content node['gitolite2']['public_key']
+    action :create
+  end
+else
+  execute "cp #{node['gitolite2']['public_key_path']} #{key_file}" do
+    creates key_file
+  end
+  file key_file do
+    owner node['gitolite2']['user']
+    group node['gitolite2']['group']
+    mode 0644
+    action :create
+  end
 end
 
 # Gitolite public key setup script
 execute "gitolite setup" do
   user node['gitolite2']['user']
-  group node['gitolite2']['user']
+  group node['gitolite2']['group']
   cwd node['gitolite2']['home']
   environment ({'HOME' => node['gitolite2']['home']})
   command "#{node['gitolite2']['home']}/bin/gitolite setup -pk #{key_file}"
