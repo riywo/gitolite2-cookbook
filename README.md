@@ -14,7 +14,8 @@ Installs gitolite
 
 |Attribute|Description|Default Value|
 |---|---|---|
-|`public_key`|Your public key string| - |
+|`public_key`|Your public key string| either `public_key` or `public_key_path` |
+|`public_key_path`|Your public key path in a node| either `public_key` or `public_key_path` |
 
 ## Optional
 

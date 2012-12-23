@@ -18,8 +18,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 #
-if node['gitolite2']['public_key'].nil?
-  Chef::Log.fatal("You must pass your public key content by gitolite/public_key")
+if node['gitolite2']['public_key'].nil? and node['gitolite2']['public_key_path'].nil?
+  Chef::Log.fatal("You must pass your public key content by gitolite/public_key or public_key_path")
+  raise Chef::Exceptions
+end
+if !node['gitolite2']['public_key'].nil? and !node['gitolite2']['public_key_path'].nil?
+  Chef::Log.fatal("either gitolite/public_key or public_key_path")
   raise Chef::Exceptions
 end
 
@@ -89,12 +93,13 @@ execute "gitolite-install" do
   creates "#{node['gitolite2']['home']}/bin/gitolite"
 end
 
-# create public key
-file "#{node['gitolite2']['home']}/.ssh/gitolite.pub" do
+# Create public key
+key_file = "#{node['gitolite2']['home']}/.ssh/admin.pub"
+file key_file do
   owner node['gitolite2']['user']
   group node['gitolite2']['group']
   mode 0644
-  content node['gitolite2']['public_key']
+  content node['gitolite2']['public_key'] || File.read(node['gitolite2']['public_key_path'])
   action :create
 end
 
@@ -104,7 +109,7 @@ execute "gitolite setup" do
   group node['gitolite2']['user']
   cwd node['gitolite2']['home']
   environment ({'HOME' => node['gitolite2']['home']})
-  command "#{node['gitolite2']['home']}/bin/gitolite setup -pk #{node['gitolite2']['home']}/.ssh/gitolite.pub"
-  not_if "grep -q '#{node['gitolite2']['public_key']}' #{node['gitolite2']['home']}/.ssh/authorized_keys"
+  command "#{node['gitolite2']['home']}/bin/gitolite setup -pk #{key_file}"
+  not_if "grep -q \"`cat #{key_file}`\" #{node['gitolite2']['home']}/.ssh/authorized_keys"
 end
 
