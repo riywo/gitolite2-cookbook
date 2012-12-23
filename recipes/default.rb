@@ -18,6 +18,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 #
+if node['gitolite']['public_key'].nil?
+  Chef::Log.fatal("You must pass your public key content by gitolite/public_key")
+  raise Chef::Exceptions
+end
+
 %w{ git perl }.each do |cb_include|
   include_recipe cb_include
 end
