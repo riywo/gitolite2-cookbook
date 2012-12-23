@@ -89,15 +89,13 @@ execute "gitolite-install" do
   creates "#{node['gitolite2']['home']}/bin/gitolite"
 end
 
-# Render public key template
-template "#{node['gitolite2']['home']}/.ssh/gitolite.pub" do
+# create public key
+file "#{node['gitolite2']['home']}/.ssh/gitolite.pub" do
   owner node['gitolite2']['user']
   group node['gitolite2']['group']
   mode 0644
-  variables(
-    :public_key => node['gitolite2']['public_key']
-  )
-  not_if { File.exists?("#{node['gitolite2']['home']}/.ssh/gitolite.pub") }
+  content node['gitolite2']['public_key']
+  action :create
 end
 
 # Gitolite public key setup script
