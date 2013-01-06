@@ -72,7 +72,17 @@ template "#{node['gitolite2']['home']}/.gitolite.rc" do
   group node['gitolite2']['group']
   mode 0644
   variables(
-    :umask => node['gitolite2']['umask']
+    :umask           => node['gitolite2']['umask'],
+    :local_code      => node['gitolite2']['local_code'],
+    :syntactic_sugar => node['gitolite2']['syntactic_sugar'],
+    :input           => node['gitolite2']['input'],
+    :access_1        => node['gitolite2']['access_1'],
+    :pre_git         => node['gitolite2']['pre_git'],
+    :access_2        => node['gitolite2']['access_2'],
+    :post_git        => node['gitolite2']['post_git'],
+    :pre_create      => node['gitolite2']['pre_create'],
+    :post_create     => node['gitolite2']['post_create'],
+    :post_compile    => node['gitolite2']['post_compile']
   )
 end
 
